@@ -1,6 +1,10 @@
 import os
 import sqlite3
+import threading
 
+
+def killtask(command):
+    os.system(command)
 conn =  sqlite3.connect('services.db')
 c = conn.cursor()
 c.execute("select port_number from services")
@@ -15,7 +19,7 @@ print(servicePortList)
 contents = []
 for i in servicePortList:
     os.system("netstat -ano | findstr :{} > port.txt".format(i))
-    with open("try.txt") as f:
+    with open("port.txt") as f:
         for line in f.readlines():
             contents.append(line)
         f.close()
@@ -30,7 +34,10 @@ print(portNumber)
 num = int(input("Enter 1 to Shut all Services"))
 if num == 1:
     for i in portNumber:
-        os.system("taskkill /PID {} /F".format(int(i)))
+        t1 = threading.Thread(target=killtask,args=("taskkill /PID {} /F".format(int(i)),))
+        t1.start()
+        print(t1.ident)
+        #os.system("taskkill /PID {} /F".format(int(i)))
     
 # with open("try.txt") as f:
 #     contents = f.readlines()
